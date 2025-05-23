@@ -1,16 +1,26 @@
-# agenda_flex
+# Plan7 - Agenda Flexível
 
-A new Flutter project.
+**Plan7** é um aplicativo de agenda flexível desenvolvido com **Flutter** e **Hive** para armazenar tarefas localmente.  
+Ideal para organização pessoal com foco em produtividade e simplicidade.
 
-## Getting Started
+## 🚀 Funcionalidades
 
-This project is a starting point for a Flutter application.
+- ✅ Cadastro de tarefas com título, lembrete e data.
+- ✅ Marcação de tarefas concluídas.
+- ✅ Exclusão ou envio de tarefas concluídas para o histórico.
+- ✅ Histórico de tarefas com data de conclusão.
+- ✅ Cronograma semanal atualizado automaticamente.
+- ✅ Interface simples e intuitiva.
 
-A few resources to get you started if this is your first Flutter project:
+## 🛠️ Tecnologias
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- **Flutter**: Framework para desenvolvimento multiplataforma.
+- **Hive**: Banco de dados local NoSQL.
+- **intl**: Formatação de datas e localização.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🎯 Como usar
+
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/lpcamphora/Plan7.git
+   cd Plan7
