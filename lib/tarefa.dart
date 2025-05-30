@@ -1,5 +1,4 @@
 import 'package:hive/hive.dart';
-import 'package:flutter/material.dart';
 
 part 'tarefa.g.dart';
 
@@ -15,13 +14,16 @@ class Tarefa extends HiveObject {
   DateTime? data;
 
   @HiveField(3)
-  String? hora; // formatada como string
+  String? hora;
 
   @HiveField(4)
   bool concluida;
 
   @HiveField(5)
-  DateTime? dataConclusao;  // ✅ novo campo para data de conclusão
+  DateTime? dataConclusao;
+
+  @HiveField(6)
+  List<Map<String, dynamic>> subTarefas; // ✅ Nova estrutura
 
   Tarefa({
     required this.titulo,
@@ -29,6 +31,7 @@ class Tarefa extends HiveObject {
     this.data,
     this.hora,
     this.concluida = false,
-    this.dataConclusao,   // ✅ adiciona no construtor também
+    this.dataConclusao,
+    this.subTarefas = const [],
   });
 }
