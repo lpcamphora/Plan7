@@ -86,7 +86,6 @@ class _HomePageState extends State<HomePage> {
                 concluida: tarefa.concluida,
                 dataConclusao: DateTime.now(),
               );
-              print("Salvando no histórico: ${novaTarefa.titulo} em ${novaTarefa.dataConclusao}");
               historicoBox.add(novaTarefa);
               tarefasBox.deleteAt(index);
               Navigator.pop(context);
@@ -101,6 +100,35 @@ class _HomePageState extends State<HomePage> {
               setState(() {});
             },
             child: const Text('Excluir'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _editarTarefa(tarefa, index);
+            },
+            child: const Text('Editar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _editarTarefa(Tarefa tarefa, int index) {
+    final controller = TextEditingController(text: tarefa.titulo);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Editar Tarefa'),
+        content: TextField(controller: controller),
+        actions: [
+          TextButton(
+            onPressed: () {
+              tarefa.titulo = controller.text;
+              tarefa.save();
+              Navigator.pop(context);
+              setState(() {});
+            },
+            child: const Text('Salvar'),
           ),
         ],
       ),
