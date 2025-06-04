@@ -1,3 +1,4 @@
+
 import 'package:hive/hive.dart';
 
 part 'tarefa.g.dart';
@@ -23,7 +24,10 @@ class Tarefa extends HiveObject {
   DateTime? dataConclusao;
 
   @HiveField(6)
-  List<Map<String, dynamic>> subTarefas; // ✅ Nova estrutura
+  List<Map<String, dynamic>> subTarefas;
+
+  @HiveField(7)
+  int cor;
 
   Tarefa({
     required this.titulo,
@@ -33,5 +37,6 @@ class Tarefa extends HiveObject {
     this.concluida = false,
     this.dataConclusao,
     this.subTarefas = const [],
+    this.cor = 0xFFE0E0E0,
   });
 }

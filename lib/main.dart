@@ -68,7 +68,7 @@ class _HomePageState extends State<HomePage> {
     final fim = getFimDaSemana(hoje);
     final inicioFormatado = DateFormat("EEEE, d", "pt_BR").format(inicio);
     final fimFormatado = DateFormat("EEEE, d", "pt_BR").format(fim);
-    return '$inicioFormatado à $fimFormatado';
+    return '\$inicioFormatado à \$fimFormatado';
   }
 
   void mostrarDialogo(Tarefa tarefa, int index) {
@@ -87,6 +87,7 @@ class _HomePageState extends State<HomePage> {
                 concluida: tarefa.concluida,
                 dataConclusao: DateTime.now(),
                 subTarefas: tarefa.subTarefas,
+                cor: tarefa.cor,
               );
               historicoBox.add(novaTarefa);
               tarefasBox.deleteAt(index);
@@ -151,33 +152,13 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('Plan7'),
       ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
-              child: Text('Menu', style: TextStyle(color: Colors.white, fontSize: 24)),
-            ),
-            ListTile(
-              leading: const Icon(Icons.history),
-              title: const Text('Histórico de Tarefas'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HistoricoPage()),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('Cronograma Semanal', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            Text('Semana $semana', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+            Text('Semana \$semana', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
             Text(intervalo, style: const TextStyle(fontSize: 14)),
             const SizedBox(height: 16),
             Expanded(
@@ -201,7 +182,7 @@ class _HomePageState extends State<HomePage> {
                           child: Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: Colors.grey[100],
+                              color: Color(tarefa.cor),
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: Column(
@@ -209,10 +190,7 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 Text(
                                   tarefa.titulo,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                                 ),
                                 const SizedBox(height: 12),
                                 Expanded(
@@ -263,6 +241,8 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
+
+
 class NovaTarefaPage extends StatefulWidget {
   const NovaTarefaPage({super.key});
 
@@ -274,6 +254,15 @@ class _NovaTarefaPageState extends State<NovaTarefaPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _tarefaController = TextEditingController();
   final List<Map<String, dynamic>> _subTarefas = [];
+  final List<Color> coresDisponiveis = [
+    Colors.red,
+    Colors.green,
+    Colors.blue,
+    Colors.orange,
+    Colors.purple,
+    Colors.grey,
+  ];
+  Color corSelecionada = Colors.grey;
 
   void _adicionarSubTarefa() async {
     final controller = TextEditingController();
@@ -315,24 +304,11 @@ class _NovaTarefaPageState extends State<NovaTarefaPage> {
               TextFormField(
                 controller: _tarefaController,
                 decoration: const InputDecoration(labelText: 'Título da tarefa'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Digite a tarefa';
-                  }
-                  return null;
-                },
+                validator: (value) => value == null || value.isEmpty ? 'Digite a tarefa' : null,
               ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Sub-tarefas', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  IconButton(
-                    onPressed: _adicionarSubTarefa,
-                    icon: const Icon(Icons.add_box_rounded),
-                  ),
-                ],
-              ),
+              const SizedBox(height: 16),
+              const Text('Sub-tarefas', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              IconButton(onPressed: _adicionarSubTarefa, icon: const Icon(Icons.add_box)),
               Expanded(
                 child: ListView.builder(
                   itemCount: _subTarefas.length,
@@ -351,7 +327,25 @@ class _NovaTarefaPageState extends State<NovaTarefaPage> {
                   },
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
+              const Text('Escolha a cor do card:', style: TextStyle(fontWeight: FontWeight.bold)),
+              Wrap(
+                spacing: 8,
+                children: coresDisponiveis.map((cor) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        corSelecionada = cor;
+                      });
+                    },
+                    child: CircleAvatar(
+                      backgroundColor: cor,
+                      child: cor == corSelecionada ? const Icon(Icons.check, color: Colors.white) : null,
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 12),
               Center(
                 child: ElevatedButton(
                   onPressed: () {
@@ -359,53 +353,17 @@ class _NovaTarefaPageState extends State<NovaTarefaPage> {
                       final tarefa = Tarefa(
                         titulo: _tarefaController.text,
                         subTarefas: _subTarefas,
+                        cor: corSelecionada.value,
                       );
                       Navigator.pop(context, tarefa);
                     }
                   },
                   child: const Text('Salvar'),
                 ),
-              )
+              ),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class HistoricoPage extends StatelessWidget {
-  const HistoricoPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final historicoBox = Hive.box<Tarefa>('historico_tarefas');
-
-    return Scaffold(
-      appBar: AppBar(title: const Text('Histórico de Tarefas')),
-      body: ValueListenableBuilder(
-        valueListenable: historicoBox.listenable(),
-        builder: (context, Box<Tarefa> box, _) {
-          final historico = box.values.toList();
-          if (historico.isEmpty) {
-            return const Center(child: Text('Nenhuma tarefa no histórico.'));
-          }
-          return ListView.builder(
-            itemCount: historico.length,
-            itemBuilder: (context, index) {
-              final tarefa = historico[index];
-              final data = tarefa.dataConclusao != null
-                  ? DateFormat('dd/MM/yyyy').format(tarefa.dataConclusao!)
-                  : 'Data não registrada';
-              return ListTile(
-                title: Text(
-                  '${tarefa.titulo} — salvo em: $data',
-                  style: const TextStyle(decoration: TextDecoration.lineThrough),
-                ),
-              );
-            },
-          );
-        },
       ),
     );
   }
