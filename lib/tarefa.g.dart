@@ -1,3 +1,4 @@
+
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'tarefa.dart';
@@ -23,13 +24,15 @@ class TarefaAdapter extends TypeAdapter<Tarefa> {
       hora: fields[3] as String?,
       concluida: fields[4] as bool,
       dataConclusao: fields[5] as DateTime?,
+      subTarefas: (fields[6] as List).cast<Map>().map((e) => Map<String, dynamic>.from(e)).toList(),
+      cor: fields[7] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, Tarefa obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.titulo)
       ..writeByte(1)
@@ -41,7 +44,11 @@ class TarefaAdapter extends TypeAdapter<Tarefa> {
       ..writeByte(4)
       ..write(obj.concluida)
       ..writeByte(5)
-      ..write(obj.dataConclusao);
+      ..write(obj.dataConclusao)
+      ..writeByte(6)
+      ..write(obj.subTarefas)
+      ..writeByte(7)
+      ..write(obj.cor);
   }
 
   @override

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
@@ -68,7 +67,7 @@ class _HomePageState extends State<HomePage> {
     final fim = getFimDaSemana(hoje);
     final inicioFormatado = DateFormat("EEEE, d", "pt_BR").format(inicio);
     final fimFormatado = DateFormat("EEEE, d", "pt_BR").format(fim);
-    return '\$inicioFormatado à \$fimFormatado';
+    return '$inicioFormatado à $fimFormatado';
   }
 
   void mostrarDialogo(Tarefa tarefa, int index) {
@@ -157,17 +156,22 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Cronograma Semanal', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            Text('Semana \$semana', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+            const Text('Cronograma Semanal',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            Text('Semana $semana',
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
             Text(intervalo, style: const TextStyle(fontSize: 14)),
             const SizedBox(height: 16),
-            Expanded(
+            SizedBox(
+              height: 450, // altura total visível do carrossel de cards
               child: ValueListenableBuilder(
                 valueListenable: tarefasBox.listenable(),
                 builder: (context, Box<Tarefa> box, _) {
                   final tarefas = box.values.toList();
                   if (tarefas.isEmpty) {
-                    return const Center(child: Text('Nenhuma tarefa adicionada.'));
+                    return const Center(
+                        child: Text('Nenhuma tarefa adicionada.'));
                   }
                   return PageView.builder(
                     controller: PageController(viewportFraction: 0.8),
@@ -176,43 +180,51 @@ class _HomePageState extends State<HomePage> {
                       final tarefa = tarefas[index];
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Material(
-                          elevation: 3,
-                          borderRadius: BorderRadius.circular(16),
-                          child: Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Color(tarefa.cor),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  tarefa.titulo,
-                                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(height: 12),
-                                Expanded(
-                                  child: ListView.builder(
-                                    itemCount: tarefa.subTarefas.length,
-                                    itemBuilder: (context, i) {
-                                      final subtarefa = tarefa.subTarefas[i];
-                                      return CheckboxListTile(
-                                        value: subtarefa['concluida'] ?? false,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            subtarefa['concluida'] = value;
-                                            tarefa.save();
-                                          });
-                                        },
-                                        title: Text(subtarefa['titulo'] ?? ''),
-                                        controlAffinity: ListTileControlAffinity.leading,
-                                      );
-                                    },
+                        child: SizedBox(
+                          height: 250, // altura individual do card
+                          child: Material(
+                            elevation: 3,
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Color(tarefa.cor),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    tarefa.titulo,
+                                    style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(height: 8),
+                                  Expanded(
+                                    child: ListView.builder(
+                                      itemCount: tarefa.subTarefas.length,
+                                      itemBuilder: (context, i) {
+                                        final subtarefa = tarefa.subTarefas[i];
+                                        return CheckboxListTile(
+                                          value:
+                                              subtarefa['concluida'] ?? false,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              subtarefa['concluida'] = value;
+                                              tarefa.save();
+                                            });
+                                          },
+                                          title:
+                                              Text(subtarefa['titulo'] ?? ''),
+                                          controlAffinity:
+                                              ListTileControlAffinity.leading,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -241,8 +253,6 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-
-
 class NovaTarefaPage extends StatefulWidget {
   const NovaTarefaPage({super.key});
 
@@ -255,12 +265,12 @@ class _NovaTarefaPageState extends State<NovaTarefaPage> {
   final TextEditingController _tarefaController = TextEditingController();
   final List<Map<String, dynamic>> _subTarefas = [];
   final List<Color> coresDisponiveis = [
-    Colors.red,
-    Colors.green,
-    Colors.blue,
-    Colors.orange,
-    Colors.purple,
-    Colors.grey,
+    Colors.grey.shade300,
+    Colors.blueGrey.shade200,
+    Colors.brown.shade200,
+    Colors.teal.shade100,
+    Colors.amber.shade100,
+    Colors.indigo.shade100,
   ];
   Color corSelecionada = Colors.grey;
 
@@ -303,12 +313,17 @@ class _NovaTarefaPageState extends State<NovaTarefaPage> {
             children: [
               TextFormField(
                 controller: _tarefaController,
-                decoration: const InputDecoration(labelText: 'Título da tarefa'),
-                validator: (value) => value == null || value.isEmpty ? 'Digite a tarefa' : null,
+                decoration:
+                    const InputDecoration(labelText: 'Título da tarefa'),
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Digite a tarefa' : null,
               ),
               const SizedBox(height: 16),
-              const Text('Sub-tarefas', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              IconButton(onPressed: _adicionarSubTarefa, icon: const Icon(Icons.add_box)),
+              const Text('Sub-tarefas',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              IconButton(
+                  onPressed: _adicionarSubTarefa,
+                  icon: const Icon(Icons.add_box)),
               Expanded(
                 child: ListView.builder(
                   itemCount: _subTarefas.length,
@@ -328,7 +343,8 @@ class _NovaTarefaPageState extends State<NovaTarefaPage> {
                 ),
               ),
               const SizedBox(height: 12),
-              const Text('Escolha a cor do card:', style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text('Escolha a cor do card:',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
               Wrap(
                 spacing: 8,
                 children: coresDisponiveis.map((cor) {
@@ -340,7 +356,9 @@ class _NovaTarefaPageState extends State<NovaTarefaPage> {
                     },
                     child: CircleAvatar(
                       backgroundColor: cor,
-                      child: cor == corSelecionada ? const Icon(Icons.check, color: Colors.white) : null,
+                      child: cor == corSelecionada
+                          ? const Icon(Icons.check, color: Colors.white)
+                          : null,
                     ),
                   );
                 }).toList(),
