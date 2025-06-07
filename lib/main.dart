@@ -70,73 +70,6 @@ class _HomePageState extends State<HomePage> {
     return '$inicioFormatado à $fimFormatado';
   }
 
-  void mostrarDialogo(Tarefa tarefa, int index) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('O que deseja fazer?'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              final novaTarefa = Tarefa(
-                titulo: tarefa.titulo,
-                lembreteAtivo: tarefa.lembreteAtivo,
-                data: tarefa.data,
-                hora: tarefa.hora,
-                concluida: tarefa.concluida,
-                dataConclusao: DateTime.now(),
-                subTarefas: tarefa.subTarefas,
-                cor: tarefa.cor,
-              );
-              historicoBox.add(novaTarefa);
-              tarefasBox.deleteAt(index);
-              Navigator.pop(context);
-              setState(() {});
-            },
-            child: const Text('Salvar'),
-          ),
-          TextButton(
-            onPressed: () {
-              tarefasBox.deleteAt(index);
-              Navigator.pop(context);
-              setState(() {});
-            },
-            child: const Text('Excluir'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _editarTarefa(tarefa, index);
-            },
-            child: const Text('Editar'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _editarTarefa(Tarefa tarefa, int index) {
-    final controller = TextEditingController(text: tarefa.titulo);
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Editar Tarefa'),
-        content: TextField(controller: controller),
-        actions: [
-          TextButton(
-            onPressed: () {
-              tarefa.titulo = controller.text;
-              tarefa.save();
-              Navigator.pop(context);
-              setState(() {});
-            },
-            child: const Text('Salvar'),
-          ),
-        ],
-      ),
-    );
-  }
-
   void adicionarTarefa(Tarefa tarefa) {
     tarefasBox.add(tarefa);
     setState(() {});
@@ -148,9 +81,7 @@ class _HomePageState extends State<HomePage> {
     final intervalo = getIntervaloSemana();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Plan7'),
-      ),
+      appBar: AppBar(title: const Text('Plan7')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -164,7 +95,7 @@ class _HomePageState extends State<HomePage> {
             Text(intervalo, style: const TextStyle(fontSize: 14)),
             const SizedBox(height: 16),
             SizedBox(
-              height: 450, // altura total visível do carrossel de cards
+              height: 450,
               child: ValueListenableBuilder(
                 valueListenable: tarefasBox.listenable(),
                 builder: (context, Box<Tarefa> box, _) {
@@ -180,50 +111,146 @@ class _HomePageState extends State<HomePage> {
                       final tarefa = tarefas[index];
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: SizedBox(
-                          height: 250, // altura individual do card
-                          child: Material(
-                            elevation: 3,
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: Color(tarefa.cor),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    tarefa.titulo,
-                                    style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Expanded(
-                                    child: ListView.builder(
-                                      itemCount: tarefa.subTarefas.length,
-                                      itemBuilder: (context, i) {
-                                        final subtarefa = tarefa.subTarefas[i];
-                                        return CheckboxListTile(
-                                          value:
-                                              subtarefa['concluida'] ?? false,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              subtarefa['concluida'] = value;
-                                              tarefa.save();
-                                            });
-                                          },
-                                          title:
-                                              Text(subtarefa['titulo'] ?? ''),
-                                          controlAffinity:
-                                              ListTileControlAffinity.leading,
-                                        );
-                                      },
+                        child: GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return Center(
+                                  child: Container(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.85,
+                                    height: 400,
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: Color(tarefa.cor),
+                                      borderRadius: BorderRadius.circular(24),
+                                    ),
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: StatefulBuilder(
+                                        builder: (context, setStateModal) {
+                                          return Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                tarefa.titulo,
+                                                style: const TextStyle(
+                                                  fontSize: 22,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 12),
+                                              Expanded(
+                                                child: ListView.builder(
+                                                  itemCount:
+                                                      tarefa.subTarefas.length,
+                                                  itemBuilder: (context, i) {
+                                                    final subtarefa =
+                                                        tarefa.subTarefas[i];
+                                                    return CheckboxListTile(
+                                                      value: subtarefa[
+                                                              'concluida'] ??
+                                                          false,
+                                                      onChanged: (value) {
+                                                        setStateModal(() {
+                                                          subtarefa[
+                                                                  'concluida'] =
+                                                              value;
+                                                          tarefa.save();
+                                                        });
+                                                      },
+                                                      title: Text(
+                                                        subtarefa['titulo'] ??
+                                                            '',
+                                                        style: TextStyle(
+                                                          decoration: (subtarefa[
+                                                                      'concluida'] ??
+                                                                  false)
+                                                              ? TextDecoration
+                                                                  .lineThrough
+                                                              : TextDecoration
+                                                                  .none,
+                                                        ),
+                                                      ),
+                                                      controlAffinity:
+                                                          ListTileControlAffinity
+                                                              .leading,
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                              Align(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(context),
+                                                  child: const Text("Fechar"),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      ),
                                     ),
                                   ),
-                                ],
+                                );
+                              },
+                            );
+                          },
+                          child: SizedBox(
+                            height: 250,
+                            child: Material(
+                              elevation: 3,
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Color(tarefa.cor),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      tarefa.titulo,
+                                      style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Expanded(
+                                      child: ListView.builder(
+                                        itemCount: tarefa.subTarefas.length,
+                                        itemBuilder: (context, i) {
+                                          final subtarefa =
+                                              tarefa.subTarefas[i];
+                                          return CheckboxListTile(
+                                            value:
+                                                subtarefa['concluida'] ?? false,
+                                            onChanged:
+                                                null, // ❌ não editável no card normal
+                                            title: Text(
+                                              subtarefa['titulo'] ?? '',
+                                              style: TextStyle(
+                                                decoration:
+                                                    (subtarefa['concluida'] ??
+                                                            false)
+                                                        ? TextDecoration
+                                                            .lineThrough
+                                                        : TextDecoration.none,
+                                              ),
+                                            ),
+                                            controlAffinity:
+                                                ListTileControlAffinity.leading,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
