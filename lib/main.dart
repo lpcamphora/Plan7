@@ -109,6 +109,12 @@ class _HomePageState extends State<HomePage> {
                     itemCount: tarefas.length,
                     itemBuilder: (context, index) {
                       final tarefa = tarefas[index];
+                      final subtarefasOrdenadas = [...tarefa.subTarefas];
+                      subtarefasOrdenadas.sort((a, b) {
+                        final aConcluida = a['concluida'] ?? false;
+                        final bConcluida = b['concluida'] ?? false;
+                        return (aConcluida ? 1 : 0) - (bConcluida ? 1 : 0);
+                      });
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: GestureDetector(
@@ -137,9 +143,9 @@ class _HomePageState extends State<HomePage> {
                                               Text(
                                                 tarefa.titulo,
                                                 style: const TextStyle(
-                                                  fontSize: 22,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
+                                                    fontSize: 22,
+                                                    fontWeight:
+                                                        FontWeight.bold),
                                               ),
                                               const SizedBox(height: 12),
                                               Expanded(
@@ -230,6 +236,21 @@ class _HomePageState extends State<HomePage> {
                                                             subtarefa[
                                                                     'concluida'] =
                                                                 value;
+                                                            tarefa.subTarefas
+                                                                .sort((a, b) {
+                                                              final aConcluida =
+                                                                  a['concluida'] ??
+                                                                      false;
+                                                              final bConcluida =
+                                                                  b['concluida'] ??
+                                                                      false;
+                                                              return (aConcluida
+                                                                      ? 1
+                                                                      : 0) -
+                                                                  (bConcluida
+                                                                      ? 1
+                                                                      : 0);
+                                                            });
                                                             tarefa.save();
                                                           });
                                                         },
@@ -294,7 +315,6 @@ class _HomePageState extends State<HomePage> {
                                                           ],
                                                         ),
                                                       );
-
                                                       if (resultado != null &&
                                                           resultado
                                                               .trim()
@@ -328,6 +348,29 @@ class _HomePageState extends State<HomePage> {
                               },
                             );
                           },
+                          onLongPress: () {
+                            showDialog(
+                              context: context,
+                              builder: (_) => AlertDialog(
+                                title: const Text("Deseja excluir este card?"),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text("NÃO"),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        tarefasBox.deleteAt(index);
+                                      });
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text("SIM"),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                           child: SizedBox(
                             height: 250,
                             child: Material(
@@ -351,10 +394,10 @@ class _HomePageState extends State<HomePage> {
                                     const SizedBox(height: 8),
                                     Expanded(
                                       child: ListView.builder(
-                                        itemCount: tarefa.subTarefas.length,
+                                        itemCount: subtarefasOrdenadas.length,
                                         itemBuilder: (context, i) {
                                           final subtarefa =
-                                              tarefa.subTarefas[i];
+                                              subtarefasOrdenadas[i];
                                           return CheckboxListTile(
                                             value:
                                                 subtarefa['concluida'] ?? false,
@@ -476,8 +519,9 @@ class _NovaTarefaPageState extends State<NovaTarefaPage> {
               const Text('Sub-tarefas',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               IconButton(
-                  onPressed: _adicionarSubTarefa,
-                  icon: const Icon(Icons.add_box)),
+                onPressed: _adicionarSubTarefa,
+                icon: const Icon(Icons.add_box),
+              ),
               Expanded(
                 child: ListView.builder(
                   itemCount: _subTarefas.length,
